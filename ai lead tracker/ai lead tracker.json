@@ -1,0 +1,377 @@
+{
+  "name": "ai lead tracker",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d567e5c3-5996-4696-8198-80e1623850cc",
+              "name": "authorDisplayName",
+              "value": "={{ $json.authorDisplayName }}",
+              "type": "string"
+            },
+            {
+              "id": "8001c0a6-e454-45ec-bd56-49929bda69c4",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "6090764b-a298-42c0-9af1-351c8c928537",
+              "name": "time",
+              "value": "={{$now.toFormat('yyyy-MM-dd HH:mm')}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1840,
+        96
+      ],
+      "id": "450222ed-2603-472c-80cf-a3577f68e506",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=customer_id:{{ $('Edit Fields').item.json.authorDisplayName }}\ncustomer_message: {{ $('Edit Fields').item.json.content }}\ntime:{{ $('Edit Fields').item.json.time }}\nsource:discord",
+        "options": {
+          "systemMessage": "You are an AI assistant bot for a gift card store on a discord server.\n\nYour job is to have a natural conversation with the customer and collect their order.\n\n**Conversation Rules:**\n1. Be friendly and helpful\n2. Ask for: product name, quantity, and delivery method\n3. If the customer hasn't provided all details, ask clarifying questions\n4. When you have ALL required info, say: \"ORDER_READY\"\n\n**Required order details:**\n- Product (e.g., PlayStation gift card, Apple gift card)\n- Quantity\n- Delivery method (digital or physical)\n\n**Your response MUST be JSON:**\n{\n  \"reply\": \"Your natural reply to the customer\",\n  \"order_ready\": false,\n  \"collected\": {\n    \"product\": null,\n    \"quantity\": null,\n    \"delivery\": null\n  },\n  \"summary\": \"Brief summary of what they want so far\"\n}\n\nWhen order_ready is true, the workflow will save the order and notify a human.\nNOTE: our store offers only digital delivery and the customers know that don't even mention a physical delivery"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1424,
+        96
+      ],
+      "id": "29acf47f-a474-4cef-be54-f783fc770fae",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -1456,
+        336
+      ],
+      "id": "0bac2578-236c-43c2-befa-148eb88b8fd0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "NYfQ7rCBGayW08Oi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Discord Trigger').item.json.authorId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        -1328,
+        336
+      ],
+      "id": "2a98d661-9b2d-4593-bc6f-9cee98b887ff",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "guildId": "1534949213232693438",
+        "channelIds": [
+          "1534954015949852703"
+        ]
+      },
+      "type": "n8n-nodes-discord-lisboa.discordTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2400,
+        96
+      ],
+      "id": "ba695446-6ef2-4961-b448-3399a8bd3f45",
+      "name": "Discord Trigger",
+      "credentials": {
+        "discordBotApi": {
+          "id": "AlO0tR7DxsG1Orip",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const json = item.json;\n  \n  // PRESERVE original data\n  const originalData = {\n    customer_id: $('Edit Fields').first().json['customer id'],\n    message: $('Edit Fields').first().json.message,\n    timestamp: json.timestamp || new Date().toISOString(),\n    source: json.source || 'Instagram (Mock)'\n  };\n  \n  // Get the AI output\n  let rawOutput = json.output || json.text || json.message || JSON.stringify(json);\n  \n  // Parse the AI output\n  let parsed = {};\n  if (typeof rawOutput === 'string') {\n    try {\n      let clean = rawOutput.trim();\n      clean = clean.replace(/```json/g, '').replace(/```/g, '').trim();\n      parsed = JSON.parse(clean);\n    } catch (e) {\n      parsed = {\n        reply: rawOutput.substring(0, 200),\n        order_ready: false,\n        collected: { product: null, quantity: null, delivery: null },\n        summary: 'Failed to parse AI output'\n      };\n    }\n  } else {\n    parsed = rawOutput;\n  }\n  \n  // Ensure collected object exists\n  const collected = parsed.collected || {};\n  \n  // Combine original data + parsed AI output\n  results.push({\n    json: {\n      // ORIGINAL DATA\n      customer_id: originalData.customer_id,\n      message: originalData.message,\n      timestamp: originalData.timestamp,\n      source: $('Edit Fields').first().json.source,\n      \n      // AI OUTPUT\n      ai_reply: parsed.reply || parsed.response || '',\n      order_ready: parsed.order_ready || false,\n      \n      // COLLECTED ORDER DETAILS\n      product: collected.product || null,\n      quantity: collected.quantity || null,\n      delivery: collected.delivery || null,\n      \n      summary: parsed.summary || '',\n      \n      // Raw AI output for debugging (optional)\n      raw_ai_output: typeof rawOutput === 'string' ? rawOutput.substring(0, 200) : JSON.stringify(rawOutput).substring(0, 200)\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1008,
+        96
+      ],
+      "id": "94336821-79bd-42d7-b919-1f27ee3fba5c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c087a2a0-fb72-44eb-999b-bd9f12159c93",
+              "name": "ai_reply",
+              "value": "={{ $json.ai_reply }}",
+              "type": "string"
+            },
+            {
+              "id": "a4a00876-f01b-4810-8e62-681a58115191",
+              "name": "score",
+              "value": "={{ $json.score }}",
+              "type": "number"
+            },
+            {
+              "id": "67dc98ca-07c6-4e4c-90ae-3d1fc3a135fe",
+              "name": "priority",
+              "value": "={{ $json.priority }}",
+              "type": "string"
+            },
+            {
+              "id": "61ef68af-f0ea-4b62-929a-5330aa7dfbc0",
+              "name": "summary",
+              "value": "={{ $json.summary }}",
+              "type": "string"
+            },
+            {
+              "id": "added90e-2620-40ca-b367-1a1bb32fe03a",
+              "name": "source",
+              "value": "={{ $json.source }}",
+              "type": "string"
+            },
+            {
+              "id": "a43bccdf-350d-4c20-a24b-e100217542ca",
+              "name": "customer_id",
+              "value": "={{ $json.customer_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -736,
+        96
+      ],
+      "id": "bcf48c5b-95d6-46c5-aba5-87c86447b1c4",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b97c9104-aebb-4232-840d-20be88f14381",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "channelId": "1534954015949852703",
+        "messageContent": "={{ $('Code in JavaScript').item.json.ai_reply }}"
+      },
+      "type": "n8n-nodes-discord-lisboa.discordAction",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        96
+      ],
+      "id": "837e8bfc-89a8-41a4-bf47-c1126defc33e",
+      "name": "Discord Action",
+      "credentials": {
+        "discordBotApi": {
+          "id": "AlO0tR7DxsG1Orip",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3db46ca0-7150-4198-bd33-b919814ad502",
+              "leftValue": "={{ $('Code in JavaScript').item.json.order_ready }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -224,
+        96
+      ],
+      "id": "ee9a2a96-b469-449e-aee5-8d41a19df1a5",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        16,
+        192
+      ],
+      "id": "fd28083c-7eee-4ef9-8ee5-e16d4a1e558b",
+      "name": "No Operation, do nothing"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Discord Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord Action": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "15a7f78f-b99d-4e56-9b1d-044657e531d0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "98e851c78470539322a0e67317ecc21fd788eecd5f31d65b3b3787570087469e"
+  },
+  "nodeGroups": [],
+  "id": "WKlzrt9hlyoIX48c",
+  "tags": []
+}
