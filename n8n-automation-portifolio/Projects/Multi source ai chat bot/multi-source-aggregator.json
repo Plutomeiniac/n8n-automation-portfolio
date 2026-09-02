@@ -1,0 +1,1351 @@
+{
+  "name": "multi-source-aggregator",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "154fd333-64cf-4661-8c4c-82420744d2e9",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -144,
+        144
+      ],
+      "id": "dd707df1-196c-4e57-8830-e6c4e9fa4d62",
+      "name": "Webhook",
+      "webhookId": "154fd333-64cf-4661-8c4c-82420744d2e9"
+    },
+    {
+      "parameters": {
+        "messagePattern": "botMention",
+        "guildId": "1534949213232693438",
+        "channelIds": [
+          "1534954015949852703"
+        ]
+      },
+      "type": "n8n-nodes-discord-lisboa.discordTrigger",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        336
+      ],
+      "id": "6d926e48-7b84-44b7-a9c3-4e81a94db675",
+      "name": "Discord Trigger",
+      "credentials": {
+        "discordBotApi": {
+          "id": "AlO0tR7DxsG1Orip",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "606017ca-22a6-43b0-ad5a-3b96203326ff",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -128,
+        -48
+      ],
+      "id": "c4e30c94-ad0b-4f3d-afd5-a1ea81730526",
+      "name": "\"insta\"",
+      "webhookId": "606017ca-22a6-43b0-ad5a-3b96203326ff"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.authorId }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "26c9e5c2-0257-45ea-b0da-738068e6593e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "discord"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "1ce853f2-7113-4fac-af86-a216abe60e25",
+                    "leftValue": "={{ $json.sender.id }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "instagram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6a154739-6068-4756-85c6-29473ec468c8",
+                    "leftValue": "={{ $json.email }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "web"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        128
+      ],
+      "id": "0a5d0ef4-2f55-4eef-94ed-5ec87d0b4cad",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1b80d2b-8f26-4741-9741-0dceabcddc7e",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "270f032b-2a0f-425e-982e-b364db5ad001",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "2b37f2f4-21ee-4040-afbe-d088088d1ae5",
+              "name": "web_message",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            },
+            {
+              "id": "0a1beea2-274f-41bb-8072-029ef73780ec",
+              "name": "source",
+              "value": "website",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        432,
+        368
+      ],
+      "id": "5c7f6688-8e0f-4a64-b1cb-740e85dabb8c",
+      "name": "web "
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb6c3aa6-1e12-49aa-9fec-bf37f5362c5c",
+              "name": "source",
+              "value": "instagram",
+              "type": "string"
+            },
+            {
+              "id": "f6a233a8-158c-4c13-941e-0f2b5d51731d",
+              "name": "sender.id",
+              "value": "={{ $json.sender.id }}",
+              "type": "string"
+            },
+            {
+              "id": "723cd17d-7189-495d-8889-a3ce3e706f34",
+              "name": "message.text",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        432,
+        144
+      ],
+      "id": "d4a4ebbd-74d4-4bcc-bf2b-a2e9f4cd2876",
+      "name": "insta"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "40ed6a5b-6771-4857-9284-cc2dadbd2a51",
+              "name": "source",
+              "value": "discord",
+              "type": "string"
+            },
+            {
+              "id": "7d4a730d-e031-4f52-86e0-db1550fd77cd",
+              "name": "authorId",
+              "value": "={{ $json.authorId }}",
+              "type": "string"
+            },
+            {
+              "id": "cdeb7ab2-4102-46a7-ad83-4a46d35e5bae",
+              "name": "authorUsername",
+              "value": "={{ $json.authorUsername }}",
+              "type": "string"
+            },
+            {
+              "id": "6205b5ee-2087-4a27-bf4f-304113e50d7f",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        432,
+        -96
+      ],
+      "id": "0161e8f6-26d3-4e8d-8b2c-a320de7a65ba",
+      "name": "discord"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a customer service AI for a business.\n\nYour job is to understand the customer's message and decide the best response.\n\n**Intent Types:**\n- \"order\": Customer wants to place an order\n- \"question\": Customer is asking a question (price, availability, delivery, etc.)\n- \"lead\": Customer is interested but not ready to order\n- \"unclear\": You need more information to understand the customer's intent\n- \"unknown\": You cannot understand the message at all\n\n**Response Guidelines:**\n1. If the intent is \"order\": Confirm the order details and proceed\n2. If the intent is \"question\": Answer clearly and helpfully\n3. If the intent is \"lead\": Capture the interest and ask for more details\n4. If the intent is \"unclear\": Ask a clarifying question to understand better\n5. If the intent is \"unknown\": Suggest connecting with a human\n\n**Return ONLY this JSON structure:**\n{\n  \"intent\": \"order | question | lead | unclear | unknown\",\n  \"response\": \"Your reply to the customer\",\n  \"clarifying_question\": \"If unclear, ask this question to get more context\",\n  \"details\": {\n    \"product\": \"extracted product name or null\",\n    \"quantity\": \"extracted quantity or null\",\n    \"delivery\": \"extracted delivery preference or null\",\n    \"question\": \"extracted question or null\",\n    \"interest\": \"extracted interest or null\"\n  },\n  \"score\": 0-100\n}\n\n**Scoring Rules:**\n- 80-100: Ready to buy (order intent)\n- 50-79: Interested but needs more info (lead intent)\n- 0-49: Not clear or just browsing (question/unclear intent)\n\n**Clarifying Questions Examples:**\n- \"Hi\" → \"Hi! Are you looking to place an order, ask a question, or just browsing?\"\n- \"I need help\" → \"Of course! Are you looking for product information, pricing, or placing an order?\"\n- \"Do you have...\" → \"We have a variety of products! Could you tell me what you're specifically looking for?\"\n- \"How much...\" → \"I'd be happy to help with pricing. Which product are you interested in?\"\n\n**Rules:**\n- If the message is just \"Hi\", \"Hello\", or similar → intent: \"unclear\"\n- If the message is too vague to understand → intent: \"unclear\"\n- If the customer is asking a specific question → intent: \"question\"\n- If the customer mentions ordering or buying → intent: \"order\"\n- If the customer shows interest but no commitment → intent: \"lead\"\n- If completely out of scope → intent: \"unknown\"\n- Keep responses short, helpful, and professional\n- Always ask one clarifying question at a time (don't overwhelm the customer)",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        912,
+        144
+      ],
+      "id": "2017e661-2549-4f61-a895-6d2efab2cbd2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        496
+      ],
+      "id": "05a6b28f-b9b7-4cb0-a82c-32457e2806af",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "NYfQ7rCBGayW08Oi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.cutomer_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        992,
+        448
+      ],
+      "id": "04d985c5-8991-47e3-8bde-b20f9650fac0",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the AI output from the previous node\nconst aiOutput = $input.item.json.output || $input.item.json.text || $input.item.json.message || '';\n\n// Try to parse the AI response\nlet parsed = {};\nlet responseText = '';\n\ntry {\n  // Remove markdown code blocks if present\n  let clean = aiOutput.trim();\n  clean = clean.replace(/```json/g, '').replace(/```/g, '').trim();\n  \n  // Parse JSON\n  parsed = JSON.parse(clean);\n  responseText = parsed.response || parsed.reply || '';\n} catch (e) {\n  // If parsing fails, fallback to raw text\n  responseText = aiOutput.substring(0, 500);\n  parsed = {\n    intent: 'unknown',\n    details: {},\n    response: responseText,\n    score: 0\n  };\n}\n\n// Extract details\nconst details = parsed.details || {};\n\n// Return separate fields\nreturn [\n  {\n    json: {\n      // Original data (preserved)\n      customer_id: $('normalization').first().json.cutomer_id || '',\n      customer_message: $('normalization').first().json.customer_message || '',\n      source: $('normalization').first().json.source || '',\n      \n      // AI parsed fields\n      intent: parsed.intent || 'unknown',\n      response: parsed.response || '',\n      score: parsed.score || 0,\n      \n      // Extracted details\n      product: details.product || '',\n      quantity: details.quantity || '',\n      delivery: details.delivery || '',\n      question: details.question || '',\n      interest: details.interest || '',\n      \n      // Raw AI output (for debugging)\n      raw_ai_output: aiOutput.substring(0, 200)\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        144
+      ],
+      "id": "1da2faf0-c956-4e26-a692-a6d4b7ca8225",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "order",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ca47568f-01b3-43bd-981c-1b8b9b813a1f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "order"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8e73da58-3a06-4ef4-b384-c338527dd11c",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "lead"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "fd4c56df-792e-4924-af9a-406cc8bb5a18",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "question",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "question"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c19e6fde-11b9-4cfc-88c6-1cf649d931c6",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "unkown",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "unkown"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "93d8de15-ad85-4e33-b5a8-9aed58ffc076",
+                    "leftValue": "={{ $json.intent }}",
+                    "rightValue": "unclear",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "unclear"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1488,
+        96
+      ],
+      "id": "da7f5622-8e7c-4c00-9647-aa295c5ae968",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1rkhIAV0TiEoYfT8muS0jDkAW9NQOogaWNAEB_lhUulI",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rkhIAV0TiEoYfT8muS0jDkAW9NQOogaWNAEB_lhUulI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rkhIAV0TiEoYfT8muS0jDkAW9NQOogaWNAEB_lhUulI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Customer ID",
+              "displayName": "Customer ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI Reply",
+              "displayName": "AI Reply",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Ready",
+              "displayName": "Order Ready",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Delivery",
+              "displayName": "Delivery",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Received",
+              "displayName": "Date Received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Handled by Human",
+              "displayName": "Handled by Human",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2288,
+        -256
+      ],
+      "id": "852573a6-9270-46b8-95a4-6a195fbeb2d8",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DfVRVL6yAMCGblHr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1856,
+        -96
+      ],
+      "id": "bb9952b1-857c-4a70-8732-4e3f9750843a",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "489be553-899a-43c3-a834-fd805a49134b",
+              "name": "=cutomer_id",
+              "value": "={{ $json.name }}{{ $json.authorUsername }}{{ $json.sender.id }}",
+              "type": "string"
+            },
+            {
+              "id": "bcf2dc23-ba45-4206-8833-166f7cb28507",
+              "name": "customer_message",
+              "value": "={{ $json.web_message }}{{ $json.content }}{{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "acb113fa-0ecc-40f4-947e-951d91bc0eaf",
+              "name": "customer_email/id",
+              "value": "={{ $json.email }}{{ $json.authorId }}{{ $json.sender.id }}",
+              "type": "string"
+            },
+            {
+              "id": "8af99942-154b-4313-bf82-3bb519301d42",
+              "name": "source",
+              "value": "={{ $json.source }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        144
+      ],
+      "id": "2b163e50-5bd9-4838-b79c-44e3c2c2c885",
+      "name": "normalization"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aa881d30-20e1-4eaf-936e-32a70f1960a9",
+              "name": "customer_id",
+              "value": "={{ $json.customer_id }}",
+              "type": "string"
+            },
+            {
+              "id": "9d2c18d1-f8eb-4e40-a5c4-9b67ceae770f",
+              "name": "source",
+              "value": "={{ $json.source }}",
+              "type": "string"
+            },
+            {
+              "id": "ebcb9d8e-f066-4e9f-97d8-640522e71a68",
+              "name": "product",
+              "value": "={{ $json.product }}",
+              "type": "string"
+            },
+            {
+              "id": "c86b36a4-f7ec-4d93-a53c-51f7c414f23b",
+              "name": "quantity",
+              "value": "={{ $json.quantity }}",
+              "type": "string"
+            },
+            {
+              "id": "6dd1bfed-285c-43ac-9c7c-f8a466c57c8e",
+              "name": "customer_message",
+              "value": "={{ $json.customer_message }}",
+              "type": "string"
+            },
+            {
+              "id": "653a52ed-4e1e-4f81-847d-150c565b46a9",
+              "name": "response",
+              "value": "={{ $json.response }}",
+              "type": "string"
+            },
+            {
+              "id": "aa0346d5-193d-4cca-946a-e2ad8b50da87",
+              "name": "delivery",
+              "value": "={{ $json.delivery }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1856,
+        96
+      ],
+      "id": "3fc4b2b9-b500-437f-ab94-25f5946eb18c",
+      "name": "lead"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1rkhIAV0TiEoYfT8muS0jDkAW9NQOogaWNAEB_lhUulI",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rkhIAV0TiEoYfT8muS0jDkAW9NQOogaWNAEB_lhUulI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1rkhIAV0TiEoYfT8muS0jDkAW9NQOogaWNAEB_lhUulI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Customer ID": "={{ $json.customer_id }}",
+            "Message": "={{ $json.customer_message }}",
+            "AI Reply": "={{ $json.response }}",
+            "Product": "={{ $json.product }}",
+            "Quantity": "={{ $json.quantity }}",
+            "Source": "={{ $json.source }}",
+            "Date Received": "={{ $now.toFormat('yyyy-MM-dd') }}",
+            "Delivery": "={{ $json.delivery }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Customer ID",
+              "displayName": "Customer ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "AI Reply",
+              "displayName": "AI Reply",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Order status",
+              "displayName": "Order status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Quantity",
+              "displayName": "Quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Delivery",
+              "displayName": "Delivery",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date Received",
+              "displayName": "Date Received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2288,
+        -32
+      ],
+      "id": "f5ba07ab-aaa3-45f8-9e46-359b3bddc76b",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DfVRVL6yAMCGblHr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Switch1').item.json.source }}",
+                    "rightValue": "website",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5e3ab9b5-3ccd-45a5-9e47-b34347a8dabe"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "website"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5ba8710c-1bb9-4611-9784-7808b85bb343",
+                    "leftValue": "={{ $('Switch1').item.json.source }}",
+                    "rightValue": "discord",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "discord"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7d04920a-c1dc-4a59-9d05-11a0b5e6af1e",
+                    "leftValue": "={{ $('Switch1').item.json.source }}",
+                    "rightValue": "insta",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "insta"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2512,
+        224
+      ],
+      "id": "de52c54d-6e60-4c11-8270-4e47b9f41f33",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.response }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2768,
+        32
+      ],
+      "id": "70af0e09-a01e-46cd-bc6a-fd4bf85ad455",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "channelId": "={{ $('Discord Trigger').item.json.channelId }}",
+        "messageContent": "={{ $json.response }}"
+      },
+      "type": "n8n-nodes-discord-lisboa.discordAction",
+      "typeVersion": 1,
+      "position": [
+        2736,
+        224
+      ],
+      "id": "49b0d7be-a430-4214-9a2a-657e92b7135f",
+      "name": "Discord Action",
+      "credentials": {
+        "discordBotApi": {
+          "id": "AlO0tR7DxsG1Orip",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2768,
+        480
+      ],
+      "id": "ac1cb29a-c790-41d3-9b87-46dccfc40d76",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-discord-lisboa.discordAction",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        416
+      ],
+      "id": "ebb5b9c1-aa0f-44b8-9574-cabf837bc534",
+      "name": "Discord Action1",
+      "credentials": {
+        "discordBotApi": {
+          "id": "AlO0tR7DxsG1Orip",
+          "name": "Discord Bot account"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "name": "John Doe",
+          "email": "john@example.com",
+          "message": "I need a quote for your services"
+        }
+      }
+    ],
+    "Discord Trigger": [
+      {
+        "json": {
+          "id": "1541741839403589693",
+          "content": "<@1541217902064304219>  tt",
+          "authorId": "936673554093707304",
+          "authorUsername": "plutomeiniac",
+          "authorDisplayName": "𝚙𝚕𝚞𝚝𝚘𝚖𝚎𝚒𝚗𝚒𝚊𝚌",
+          "authorBot": false,
+          "channelId": "1534954015949852703",
+          "guildId": "1534949213232693438",
+          "timestamp": 1787650298692,
+          "editedTimestamp": null,
+          "attachments": [],
+          "embedCount": 0,
+          "mentionedUsers": [
+            "1541217902064304219"
+          ],
+          "mentionedRoles": [],
+          "mentionedEveryone": false,
+          "pinned": false,
+          "messageUrl": "https://discord.com/channels/1534949213232693438/1534954015949852703/1541741839403589693"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "\"insta\"": [
+      {
+        "json": {
+          "sender": {
+            "id": "mock_user_123456789"
+          },
+          "recipient": {
+            "id": "your_business_id"
+          },
+          "timestamp": "2026-08-25T12:00:00Z",
+          "message": {
+            "text": "Hi, I need a quote for your services"
+          }
+        }
+      }
+    ],
+    "AI Agent": [
+      {
+        "json": {
+          "output": "{\n  \"intent\": \"lead\",\n  \"response\": \"Hi John! I would be happy to provide a quote for you. To get started, could you please tell me more about which services you are interested in?\",\n  \"clarifying_question\": \"Which specific services are you looking to get a quote for?\",\n  \"details\": {\n    \"product\": \"services\",\n    \"quantity\": null,\n    \"delivery\": null,\n    \"question\": \"I need a quote for your services\",\n    \"interest\": \"services\"\n  },\n  \"score\": 65\n}"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Discord Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "\"insta\"": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "discord",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "insta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "web ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "web ": {
+      "main": [
+        [
+          {
+            "node": "normalization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "insta": {
+      "main": [
+        [
+          {
+            "node": "normalization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "discord": {
+      "main": [
+        [
+          {
+            "node": "normalization",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord Action1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "normalization": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "lead": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        []
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Discord Action",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discord Action1": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "82ef4f53-c3cb-4b8d-88a6-7cb7c82aa0f1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "98e851c78470539322a0e67317ecc21fd788eecd5f31d65b3b3787570087469e"
+  },
+  "nodeGroups": [],
+  "id": "7yycMlWxpEmp3QNc",
+  "tags": []
+}
